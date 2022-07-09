@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/munflix/static/js/main.51a5ad88.js",
+    "index.html": "/munflix/index.html",
+    "main.51a5ad88.js.map": "/munflix/static/js/main.51a5ad88.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.51a5ad88.js"
+  ]
+}

@@ -1,14 +1,19 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 import { createGlobalStyle, ThemeProvider } from 'styled-components';
 import App from './App';
 import { theme } from './theme';
+import ReactDOM from 'react-dom';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+
+// const root = ReactDOM.createRoot(
+//   document.getElementById('root') as HTMLElement
+// );
+
+const client = new QueryClient();
+
 
 
 const GlobalStyle = createGlobalStyle`
@@ -39,6 +44,9 @@ footer, header, hgroup, menu, nav, section {
 }
 body {
 	line-height: 1;
+	font-weight:300;
+	color:${props=> props.theme.white.darker};
+	background-color:black;
 }
 ol, ul {
 	list-style: none;
@@ -59,15 +67,18 @@ table {
  box-sizing:border-box;
 }
 `
-root.render(
+ReactDOM.render(
   <React.StrictMode>
     <RecoilRoot>
-      <ThemeProvider theme={theme}>
-        <GlobalStyle />
-        <App />
-      </ThemeProvider>
+		<QueryClientProvider client={client}>
+			<ThemeProvider theme={theme}>
+				<GlobalStyle />
+				<App />
+			</ThemeProvider>
+		</QueryClientProvider>
     </RecoilRoot>
-  </React.StrictMode>
+  </React.StrictMode>,
+  document.getElementById('root')
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -1,6 +1,7 @@
 import { motion, useAnimation, useViewportScroll } from "framer-motion";
 import { useEffect, useState } from "react";
-import { Link, useMatch } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { Link, Navigate, useMatch, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const Nav = styled(motion.nav)`
@@ -104,6 +105,10 @@ const navVariants = {
     backgroundColor:'rgba(0,0,0,1)',
   }
 }
+
+interface IForm {
+  keyword:string;
+}
 function Header(){
   const [searchOpen,setSearchOpen] = useState(false)
   const homeMatch = useMatch('/')
@@ -111,6 +116,12 @@ function Header(){
   const inputAnimation = useAnimation() // animation 조건문사용
   const navAnimation = useAnimation()
   const {scrollY} = useViewportScroll() // scroll 값을 읽어온다
+  const navigate = useNavigate()
+  const {register,handleSubmit,setValue } = useForm<IForm>()
+  const onValid = (data:IForm) => {
+    navigate(`/search?keyword=${data.keyword}`)
+    setValue('keyword','')
+  }
   const toggleSearch = ()=>{
     if(searchOpen){
       inputAnimation.start({
@@ -160,7 +171,7 @@ function Header(){
               </Items>
             </Col>
             <Col>
-              <Search >
+              <Search onSubmit={handleSubmit(onValid)}>
               <motion.svg
                 onClick={toggleSearch}
                 animate={{x : searchOpen ? -150 : 0 }}
@@ -176,9 +187,11 @@ function Header(){
                 ></path>
                 </motion.svg>
                 {searchOpen && <Input
+                {...register('keyword',{required:true,minLength:2})}
                 animate={inputAnimation}
                 transition={{type:'tween'}}
-                  placeholder="Search..." />}
+                  placeholder="Search..." />
+                }
               </Search>
             </Col>
         </Nav>

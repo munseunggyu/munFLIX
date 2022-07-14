@@ -166,6 +166,7 @@ function Header(){
                 animate={{x : searchOpen ? -150 : 0 }}
                 fill="currentColor"
                 viewBox="0 0 20 20"
+                transition={{type:'tween'}}
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
@@ -176,7 +177,7 @@ function Header(){
                 </motion.svg>
                 {searchOpen && <Input
                 animate={inputAnimation}
-                
+                transition={{type:'tween'}}
                   placeholder="Search..." />}
               </Search>
             </Col>

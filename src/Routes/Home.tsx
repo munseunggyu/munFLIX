@@ -5,6 +5,8 @@ import { matchRoutes, useMatch, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { getNowMovies, IGetMoviesResult } from "../api"
 import { makeImagePath } from "../utilts"
+import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
+
 
 const Wrapper = styled.div`
   background:black;
@@ -37,14 +39,20 @@ const Slider = styled.div`
   position: relative;
   top:-100px;
   margin-bottom:20px;
-  padding-left:20px;
 `;
+const SliderTitle = styled.h3`
+  font-size:26px;
+  font-weight:700;
+  padding-left:35px;
+  padding-bottom:10px;
+`
 const Row = styled(motion.div)`
   display: grid;
   grid-template-columns:repeat(6,1fr);
   gap:5px;
   position:absolute;
   width:100%;
+  padding: 0 30px;
 `;
 const Box = styled(motion.div)<{bgphoto : string}>`
   background-color: #fff;
@@ -61,6 +69,19 @@ const Box = styled(motion.div)<{bgphoto : string}>`
     transform-origin:center right;
   }
 `;
+const Arrow = styled.div<{right:boolean}>`
+  position:absolute;
+  width:30px;
+  height:200px;
+  background-color:rgba(0,0,0,0.5);
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  right: ${props => props.right ? 0 : null};
+  left: ${props => props.right ? null : 0};
+  
+`;
+
 const Info = styled(motion.div)`
   padding: 10px;
   background-color:${props=>props.theme.black.lighter};
@@ -113,22 +134,17 @@ const BigCover = styled.div`
    top: -80px;
    color: ${(props) => props.theme.white.lighter};
  `;
- const SliderTitle = styled.h3`
-  font-size:26px;
-  font-weight:700;
-  padding-left:40px;
-  padding-bottom:10px;
- `
-const rowVariants ={
-  hidden:{
-    x:window.outerWidth +5,
+
+const rowVariants = {
+  hidden: (clickReverse:boolean) => ({
+    x: clickReverse ? -window.outerWidth - 5 : window.outerWidth + 5,
+  }),
+  visible: {
+    x: 0,
   },
-  visible:{
-    x:0,
-  },
-  exit:{
-    x:-window.outerWidth -5,
-  }
+  exit:(clickReverse:boolean) => ({
+    x: clickReverse ? window.outerWidth + 5 : -window.outerWidth - 5,
+  }),
 };
 const boxVariants = {
   nomal:{
@@ -159,40 +175,54 @@ const infoVariants = {
 function Home(){
   const {data,isLoading} = useQuery<IGetMoviesResult>(['movies','nowPlaying'],getNowMovies)
   const [index,setIndex] = useState(0)
+  const width = window.outerWidth;
   const offset = 6
   const bigMovieMatch= useMatch('/movies/:id')
   const navigate = useNavigate()
   const {scrollY} = useViewportScroll()
   const [leaving,setLeaving] = useState(false)
   const toggleLeaving = () => setLeaving(prev => !prev)
+  const [clickReverse,setClickReverse] = useState(false)
   const increaseIndex = () => {
    if(data){
     if(leaving) return
+    setClickReverse(false)
     toggleLeaving()
     const maxIndex = Math.ceil(data.results.slice(1).length/offset)-1
     setIndex(prev=> maxIndex > prev ? prev+1 : 0)
    }
   }
+  const decreaseIndex = () =>{
+    if(data){
+      if(leaving) return
+      setClickReverse(true)
+      toggleLeaving()
+      const maxIndex = Math.ceil(data.results.slice(1).length/offset)-1
+      setIndex(prev=> prev !==0 ? prev-1 : 0)
+     }
+  }
   const onBoxClicked = (movieId:number) => {
     navigate(`/movies/${movieId}`)
   }
   const onOverlayClick = () => navigate('/')
-  const clickedMovie = bigMovieMatch?.params.id && data?.results.find(movie => String(movie.id) === bigMovieMatch.params.id)
+  const clickedMovie = bigMovieMatch?.params.id && 
+  data?.results.find(movie => String(movie.id) === bigMovieMatch.params.id)
   console.log(clickedMovie)
   return(
     <Wrapper>
       {
         isLoading ? <Lodder> Lodding... </Lodder> : 
         <>
-          <Banner onClick={increaseIndex} bgphoto={makeImagePath(data?.results[0].backdrop_path || '')}>
+          <Banner  bgphoto={makeImagePath(data?.results[0].backdrop_path || '')}>
             <BannerTitle> {data?.results[0].title}</BannerTitle>
             <Overview > {data?.results[0].overview} </Overview>
           </Banner>
           <Slider>
             <SliderTitle> Now Playing</SliderTitle>
-            <AnimatePresence initial={false} onExitComplete={toggleLeaving}>
+            <AnimatePresence initial={false} custom={clickReverse} onExitComplete={toggleLeaving}>
               <Row  
               key={index}
+              custom={clickReverse}
               variants={rowVariants}
               initial='hidden'
               animate='visible'
@@ -200,19 +230,26 @@ function Home(){
               transition={{type:'tween',duration:1}}
               >
                 {data?.results.slice(1).slice(index*offset,index*offset+offset).map(movie=>
-                <Box key={movie.id} 
-                layoutId={movie.id+""}
-                whileHover='hover'
-                initial='nomal'
-                variants={boxVariants}
-                transition={{type:'tween'}}
-                bgphoto={makeImagePath(movie.backdrop_path,'w500')}
-                onClick={() => onBoxClicked(movie.id)}
-                > 
-                  <Info variants={infoVariants}>
-                    <h4>{movie.title}</h4>
-                  </Info> 
-                </Box>
+                <>
+                  <Box key={movie.id} 
+                  layoutId={movie.id+""}
+                  whileHover='hover'
+                  initial='nomal'
+                  variants={boxVariants}
+                  transition={{type:'tween'}}
+                  bgphoto={makeImagePath(movie.backdrop_path,'w500')}
+                  onClick={() => onBoxClicked(movie.id)}
+                  > 
+                    <Info variants={infoVariants}>
+                      <h4>{movie.title}</h4>
+                    </Info> 
+                  </Box>
+                  { index !== 0 &&
+                    <Arrow right={false} onClick={decreaseIndex} > <IoIosArrowBack size='70' /> </Arrow>
+                  }
+                 <Arrow right={true} onClick={increaseIndex}> <IoIosArrowForward size='30' /> </Arrow>
+         
+                 </>
                 )}
               </Row>
             </AnimatePresence>

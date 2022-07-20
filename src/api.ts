@@ -1,3 +1,5 @@
+import { Types } from "./utilts";
+
 const BASE_PATH = "https://api.themoviedb.org/3";
 
 interface IMovie {
@@ -19,8 +21,8 @@ export interface IGetMoviesResult {
     total_results: number;
 }
 
-export function getNowMovies(){
-    return fetch(`${BASE_PATH}/movie/now_playing?api_key=${process.env.REACT_APP_API_KEY}`).then(
+export function getMovies(type:Types){
+    return fetch(`${BASE_PATH}/movie/${type}?api_key=${process.env.REACT_APP_API_KEY}`).then(
         (response) => response.json()
     );
 }

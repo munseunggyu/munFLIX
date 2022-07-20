@@ -3,14 +3,17 @@ import { useState } from "react"
 import { useQuery } from "react-query"
 import { matchRoutes, useMatch, useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { getNowMovies, IGetMoviesResult } from "../api"
-import { makeImagePath } from "../utilts"
+import { getMovies, IGetMoviesResult } from "../api"
+import { makeImagePath, Types } from "../utilts"
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
 
 const SliderContainer = styled.div`
-position: relative;
-top:-100px;
-margin-bottom:20px;
+/* position: relative; */
+/* top:-100px; */
+margin-bottom:250px;
+&:last-child{
+  margin-bottom:150px;
+}
 `;
 const SliderTitle = styled.h3`
 font-size:26px;
@@ -115,6 +118,7 @@ const BigMovie = styled(motion.div)`
   left: 0;
   right: 0;
   margin: 0 auto;
+  z-index:99;
   border-radius: 15px;
   overflow: hidden;
   background-color: ${props => props.theme.black.lighter};
@@ -141,12 +145,12 @@ const BigCover = styled.div`
    color: ${(props) => props.theme.white.lighter};
  `;
 
-function Slider(){
-  const {data} = useQuery<IGetMoviesResult>(['movies','nowPlaying'],getNowMovies)
+function Slider({type}:{type:Types}){
+  const {data} = useQuery<IGetMoviesResult>(['movies',type],() => getMovies(type))
   const [index,setIndex] = useState(0)
   const {scrollY} =useViewportScroll()
   const offset = 6
-  const bigMovieMatch= useMatch('/movies/:id')
+  const bigMovieMatch= useMatch(`/movies/${type}/:movieId`)
   const navigate = useNavigate()
   const [leaving,setLeaving] = useState(false)
   const toggleLeaving = () => setLeaving(prev => !prev)
@@ -169,16 +173,26 @@ function Slider(){
       setIndex(prev=> prev !==0 ? prev-1 : 0)
      }
   }
-  const onBoxClicked = (movieId:number) => {
-    navigate(`/movies/${movieId}`)
-  }
+  // const onBoxClicked = (movieId:number) => {
+  //   navigate(`/movies/${movieId}`)
+  // }
+  const onBoxClicked = ({
+    movieId,
+    category,
+  }: {
+    movieId: number;
+    category: string;
+  }) => {
+    navigate(`/movies/${category}/${movieId}`);
+  };
   const onOverlayClick = () => navigate('/')
-  const clickedMovie = bigMovieMatch?.params.id && 
-  data?.results.find(movie => String(movie.id) === bigMovieMatch.params.id)
+  const clickedMovie = bigMovieMatch?.params.movieId && 
+  data?.results.find(movie => String(movie.id) === bigMovieMatch.params.movieId)
+  console.log(scrollY)
   return (
     <>
       <SliderContainer>
-        <SliderTitle> Now Playing</SliderTitle>
+        <SliderTitle> {type}  </SliderTitle>
         <AnimatePresence initial={false} custom={clickReverse} onExitComplete={toggleLeaving}>
         <Row  
         key={index}
@@ -191,14 +205,14 @@ function Slider(){
         >
           {data?.results.slice(1).slice(index*offset,index*offset+offset).map(movie=>
           <>
-            <Box key={movie.id} 
-            layoutId={movie.id+""}
+            <Box key={type + movie.id} 
+            layoutId={type + movie.id}
             whileHover='hover'
             initial='nomal'
             variants={boxVariants}
             transition={{type:'tween'}}
             bgphoto={makeImagePath(movie.backdrop_path,'w500')}
-            onClick={() => onBoxClicked(movie.id)}
+            onClick={() => onBoxClicked({movieId:movie.id,category:type})}
             > 
               <Info variants={infoVariants}>
                 <h4>{movie.title}</h4>
@@ -220,8 +234,8 @@ function Slider(){
         <Overlay onClick={onOverlayClick}
     />  
         <BigMovie
-        style={{top:scrollY.get() +100}}
-        layoutId={bigMovieMatch.params.id}
+        style={{top:scrollY.get() -550}}
+        layoutId={type + bigMovieMatch.params.movieId!!}
         > 
               {clickedMovie && (
               <>

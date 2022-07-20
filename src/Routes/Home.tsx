@@ -1,12 +1,8 @@
-import { AnimatePresence, motion, useViewportScroll } from "framer-motion"
-import { useState } from "react"
 import { useQuery } from "react-query"
-import { matchRoutes, useMatch, useNavigate } from "react-router-dom"
 import styled from "styled-components"
 import { getMovies, IGetMoviesResult } from "../api"
 import { makeImagePath, Types } from "../utilts"
-import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
-import Slider from "../Components/Slider"
+import Slider from "../Components/MovieSlider"
 
 
 const Wrapper = styled.div`
@@ -57,10 +53,10 @@ function Home(){
             
           </Banner>
           <SliderWrapper>
-            <Slider type={Types.now_playing} />
-            <Slider type={Types.popular} />
-            <Slider type={Types.top_rated} />
-            <Slider type={Types.upcoming} />
+            <Slider chlidren='Now Playing' type={Types.now_playing} />
+            <Slider chlidren="Popular" type={Types.popular} />
+            <Slider chlidren="Top Rated" type={Types.top_rated} />
+            <Slider chlidren="Upcoming" type={Types.upcoming} />
           </SliderWrapper>
         </>
 

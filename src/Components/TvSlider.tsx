@@ -3,8 +3,8 @@ import { useState } from "react"
 import { useQuery } from "react-query"
 import { matchRoutes, useMatch, useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { getMovies, IGetMoviesResult } from "../api"
-import { makeImagePath, Types } from "../utilts"
+import { getMovies, getTvs, IGetMoviesResult, IGetTvsResult } from "../api"
+import { makeImagePath, TvTypes, Types } from "../utilts"
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
 
 const SliderContainer = styled.div`
@@ -27,14 +27,13 @@ grid-template-columns:repeat(6,1fr);
 gap:5px;
 position:absolute;
 width:100%;
-padding: 0 30px;
 `;
 const Box = styled(motion.div)<{bgphoto : string}>`
 background-color: #fff;
-height:150px;
 background-image:url(${props=>props.bgphoto});
 background-size:cover;
 height:200px;
+cursor: pointer;
 background-position:center center;
 position:relative;
 &:first-child{
@@ -46,9 +45,12 @@ position:relative;
 `;
 const Arrow = styled.div<{right:boolean}>`
 position:absolute;
-width:30px;
-height:200px;
+width:40px;
+height:100%;
+z-index:2;
+cursor: pointer;
 background-color:rgba(0,0,0,0.5);
+opacity:0.3;
 display: flex;
 align-items:center;
 justify-content:center;
@@ -57,7 +59,7 @@ left: ${props => props.right ? null : 0};
 `;
 const Info = styled(motion.div)`
   padding: 10px;
-  background-color:${props=>props.theme.black.lighter};
+  background-color:rgba(0,0,0,0.5);
   position:absolute;
   width:100%;
   bottom:0;
@@ -145,12 +147,12 @@ const BigCover = styled.div`
    color: ${(props) => props.theme.white.lighter};
  `;
 
-function Slider({type}:{type:Types}){
-  const {data} = useQuery<IGetMoviesResult>(['movies',type],() => getMovies(type))
+function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
+  const {data} = useQuery<IGetTvsResult>(['movies',type],() => getTvs(type))
   const [index,setIndex] = useState(0)
   const {scrollY} =useViewportScroll()
   const offset = 6
-  const bigMovieMatch= useMatch(`/movies/${type}/:movieId`)
+  const bigMovieMatch= useMatch(`/tv/${type}/:tvId`)
   const navigate = useNavigate()
   const [leaving,setLeaving] = useState(false)
   const toggleLeaving = () => setLeaving(prev => !prev)
@@ -173,26 +175,23 @@ function Slider({type}:{type:Types}){
       setIndex(prev=> prev !==0 ? prev-1 : 0)
      }
   }
-  // const onBoxClicked = (movieId:number) => {
-  //   navigate(`/movies/${movieId}`)
-  // }
   const onBoxClicked = ({
-    movieId,
+    tvId,
     category,
   }: {
-    movieId: number;
+    tvId: number;
     category: string;
   }) => {
-    navigate(`/movies/${category}/${movieId}`);
+    navigate(`/tv/${category}/${tvId}`);
   };
-  const onOverlayClick = () => navigate('/')
-  const clickedMovie = bigMovieMatch?.params.movieId && 
-  data?.results.find(movie => String(movie.id) === bigMovieMatch.params.movieId)
-  console.log(scrollY)
+  const onOverlayClick = () => navigate('/tv')
+  const clickedMovie = bigMovieMatch?.params.tvId && 
+  data?.results.find(movie => String(movie.id) === bigMovieMatch.params.tvId)
+  console.log(clickedMovie)
   return (
     <>
       <SliderContainer>
-        <SliderTitle> {type}  </SliderTitle>
+        <SliderTitle> {chlidren}  </SliderTitle>
         <AnimatePresence initial={false} custom={clickReverse} onExitComplete={toggleLeaving}>
         <Row  
         key={index}
@@ -203,25 +202,25 @@ function Slider({type}:{type:Types}){
         exit='exit'
         transition={{type:'tween',duration:1}}
         >
-          {data?.results.slice(1).slice(index*offset,index*offset+offset).map(movie=>
+          {data?.results.slice(1).slice(index*offset,index*offset+offset).map(tv=>
           <>
-            <Box key={type + movie.id} 
-            layoutId={type + movie.id}
+            <Box key={type + tv.id} 
+            layoutId={type + tv.id}
             whileHover='hover'
             initial='nomal'
             variants={boxVariants}
             transition={{type:'tween'}}
-            bgphoto={makeImagePath(movie.backdrop_path,'w500')}
-            onClick={() => onBoxClicked({movieId:movie.id,category:type})}
+            bgphoto={makeImagePath(tv.backdrop_path ? tv.backdrop_path : tv.poster_path,'w500')}
+            onClick={() => onBoxClicked({tvId:tv.id,category:type})}
             > 
               <Info variants={infoVariants}>
-                <h4>{movie.title}</h4>
+                <h4>{tv.name}</h4>
               </Info> 
             </Box>
             { index !== 0 &&
               <Arrow right={false} onClick={decreaseIndex} > <IoIosArrowBack size='70' /> </Arrow>
             }
-          <Arrow right={true} onClick={increaseIndex}> <IoIosArrowForward size='30' /> </Arrow>
+          <Arrow right={true} onClick={increaseIndex}> <IoIosArrowForward size='40' /> </Arrow>
   
           </>
           )}
@@ -235,20 +234,20 @@ function Slider({type}:{type:Types}){
     />  
         <BigMovie
         style={{top:scrollY.get() -550}}
-        layoutId={type + bigMovieMatch.params.movieId!!}
+        layoutId={type + bigMovieMatch.params.tvId!!}
         > 
               {clickedMovie && (
               <>
                 <BigCover
                   style={{
                     backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                      clickedMovie.backdrop_path,
+                      clickedMovie.backdrop_path ? clickedMovie.backdrop_path : clickedMovie.poster_path ,
                       "w500"
                     )})`,
                   }}
                 />
-                <BigTitle>{clickedMovie.title}</BigTitle>
-                <BigOverview>{clickedMovie.overview}</BigOverview>
+                <BigTitle>{clickedMovie.name}</BigTitle>
+                <BigOverview>{clickedMovie.overview ? clickedMovie.overview : clickedMovie.name}</BigOverview>
               </>
             )}
         </BigMovie>
@@ -259,4 +258,4 @@ function Slider({type}:{type:Types}){
   );
 }
 
-export default Slider;
+export default TvSlider;

@@ -8,3 +8,10 @@ export enum Types {
   "top_rated" = "top_rated",
   "upcoming" = "upcoming",
 }
+
+export enum TvTypes {
+  "on_the_air" = "on_the_air",
+  "popular" = "popular",
+  "airing_today" = "airing_today",
+  "top_rated" = "top_rated"
+}

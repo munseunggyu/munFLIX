@@ -43,8 +43,7 @@ const SliderWrapper = styled.div`
 
 
 function Tv(){
-  const {data,isLoading} = useQuery<IGetTvsResult>(['movies','popular'],() => getTvs(TvTypes.popular))
-  console.log(data)
+  const {data,isLoading} = useQuery<IGetTvsResult>(['tvs','popular'],() => getTvs(TvTypes.popular))
   return(
     <Wrapper>
       {

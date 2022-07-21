@@ -148,7 +148,7 @@ const BigCover = styled.div`
  `;
 
 function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
-  const {data} = useQuery<IGetTvsResult>(['movies',type],() => getTvs(type))
+  const {data} = useQuery<IGetTvsResult>(['tvs',type],() => getTvs(type))
   const [index,setIndex] = useState(0)
   const {scrollY} =useViewportScroll()
   const offset = 6
@@ -187,14 +187,13 @@ function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
   const onOverlayClick = () => navigate('/tv')
   const clickedMovie = bigMovieMatch?.params.tvId && 
   data?.results.find(movie => String(movie.id) === bigMovieMatch.params.tvId)
-  console.log(clickedMovie)
   return (
     <>
       <SliderContainer>
         <SliderTitle> {chlidren}  </SliderTitle>
         <AnimatePresence initial={false} custom={clickReverse} onExitComplete={toggleLeaving}>
         <Row  
-        key={index}
+        key={type + index}
         custom={clickReverse}
         variants={rowVariants}
         initial='hidden'

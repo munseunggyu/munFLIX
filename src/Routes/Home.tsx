@@ -2,7 +2,7 @@ import { useQuery } from "react-query"
 import styled from "styled-components"
 import { getMovies, IGetMoviesResult } from "../api"
 import { makeImagePath, Types } from "../utilts"
-import Slider from "../Components/MovieSlider"
+import MovieSlider from "../Components/MovieSlider"
 
 
 const Wrapper = styled.div`
@@ -53,10 +53,10 @@ function Home(){
             
           </Banner>
           <SliderWrapper>
-            <Slider chlidren='Now Playing' type={Types.now_playing} />
-            <Slider chlidren="Popular" type={Types.popular} />
-            <Slider chlidren="Top Rated" type={Types.top_rated} />
-            <Slider chlidren="Upcoming" type={Types.upcoming} />
+            <MovieSlider chlidren='Now Playing' type={Types.now_playing} />
+            <MovieSlider chlidren="Popular" type={Types.popular} />
+            <MovieSlider chlidren="Top Rated" type={Types.top_rated} />
+            <MovieSlider chlidren="Upcoming" type={Types.upcoming} />
           </SliderWrapper>
         </>
 

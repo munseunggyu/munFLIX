@@ -147,10 +147,9 @@ const BigCover = styled.div`
    color: ${(props) => props.theme.white.lighter};
  `;
 
-function Slider({type,chlidren}:{type:Types,chlidren:string}){
+function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
   const {data} = useQuery<IGetMoviesResult>(['movies',type],() => getMovies(type))
   const [index,setIndex] = useState(0)
-  console.log(data?.results[0].vote_average)
   const {scrollY} =useViewportScroll()
   const offset = 6
   const bigMovieMatch= useMatch(`/movies/${type}/:movieId`)
@@ -194,7 +193,7 @@ function Slider({type,chlidren}:{type:Types,chlidren:string}){
         <SliderTitle> {chlidren}  </SliderTitle>
         <AnimatePresence initial={false} custom={clickReverse} onExitComplete={toggleLeaving}>
         <Row  
-        key={index}
+        key={type + index}
         custom={clickReverse}
         variants={rowVariants}
         initial='hidden'
@@ -258,4 +257,4 @@ function Slider({type,chlidren}:{type:Types,chlidren:string}){
   );
 }
 
-export default Slider;
+export default MovieSlider;

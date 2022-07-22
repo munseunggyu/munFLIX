@@ -34,6 +34,7 @@ footer, header, hgroup, menu, nav, section {
 }
 body {
 	line-height: 1;
+	overflow-x:hidden; // slider x axis scroll hidden
 	font-weight:300;
 	color:${props=> props.theme.white.darker};
 	background-color:black;

@@ -8,8 +8,6 @@ import { makeImagePath, TvTypes, Types } from "../utilts"
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
 
 const SliderContainer = styled.div`
-/* position: relative; */
-/* top:-100px; */
 margin-bottom:250px;
 &:last-child{
   margin-bottom:150px;
@@ -46,11 +44,10 @@ position:relative;
 const Arrow = styled.div<{right:boolean}>`
 position:absolute;
 width:40px;
-height:100%;
+height:200px;
 z-index:2;
 cursor: pointer;
 background-color:rgba(0,0,0,0.5);
-opacity:0.3;
 display: flex;
 align-items:center;
 justify-content:center;
@@ -162,7 +159,7 @@ function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
     if(leaving) return
     setClickReverse(false)
     toggleLeaving()
-    const maxIndex = Math.ceil(data.results.slice(1).length/offset)-1
+    const maxIndex = Math.floor(data.results.slice(1).length/offset)-1
     setIndex(prev=> maxIndex > prev ? prev+1 : 0)
    }
   }
@@ -171,8 +168,8 @@ function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
       if(leaving) return
       setClickReverse(true)
       toggleLeaving()
-      const maxIndex = Math.ceil(data.results.slice(1).length/offset)-1
-      setIndex(prev=> prev !==0 ? prev-1 : 0)
+      const maxIndex = Math.floor(data.results.slice(1).length/offset)-1
+      setIndex(prev=> prev !==0 ? prev-1 : maxIndex)
      }
   }
   const onBoxClicked = ({
@@ -216,15 +213,15 @@ function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
                 <h4>{tv.name}</h4>
               </Info> 
             </Box>
-            { index !== 0 &&
-              <Arrow right={false} onClick={decreaseIndex} > <IoIosArrowBack size='70' /> </Arrow>
-            }
-          <Arrow right={true} onClick={increaseIndex}> <IoIosArrowForward size='40' /> </Arrow>
-  
+       
           </>
           )}
         </Row>
       </AnimatePresence>
+      <Arrow right={false} onClick={decreaseIndex} > <IoIosArrowBack size='70' /> </Arrow>
+      <Arrow right={true} onClick={increaseIndex}> <IoIosArrowForward size='40' /> </Arrow>
+
+
     </SliderContainer>
     <AnimatePresence>
     {bigMovieMatch ? (

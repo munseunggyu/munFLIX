@@ -8,9 +8,8 @@ import { makeImagePath, Types } from "../utilts"
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
 
 const SliderContainer = styled.div`
-/* position: relative; */
-/* top:-100px; */
 margin-bottom:250px;
+top:-100px;
 &:last-child{
   margin-bottom:150px;
 }
@@ -40,17 +39,16 @@ position:relative;
   transform-origin:center left;
 }
 &:last-child{
-  transform-origin:center right;
+  transform-origin: center right;
 }
 `;
 const Arrow = styled.div<{right:boolean}>`
 position:absolute;
 width:40px;
-height:100%;
+height:200px;
 z-index:2;
 cursor: pointer;
 background-color:rgba(0,0,0,0.5);
-opacity:0.3;
 display: flex;
 align-items:center;
 justify-content:center;
@@ -85,15 +83,15 @@ const boxVariants = {
     scale:1,
   },
   hover:{
-    zIndex:99,
+    zIndex:90,
     scale:1.3,
     y:-50,
     transition:{
       delay:.3,
       duration:.3,
       type:'tween',
-    }
-  }
+    },
+  },
 };
 const infoVariants = {
   hover:{
@@ -162,7 +160,7 @@ function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
     if(leaving) return
     setClickReverse(false)
     toggleLeaving()
-    const maxIndex = Math.ceil(data.results.slice(1).length/offset)-1
+    const maxIndex = Math.floor(data.results.slice(1).length/offset)-1
     setIndex(prev=> maxIndex > prev ? prev+1 : 0)
    }
   }
@@ -171,8 +169,8 @@ function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
       if(leaving) return
       setClickReverse(true)
       toggleLeaving()
-      const maxIndex = Math.ceil(data.results.slice(1).length/offset)-1
-      setIndex(prev=> prev !==0 ? prev-1 : 0)
+      const maxIndex = Math.floor(data.results.slice(1).length/offset)-1
+      setIndex(prev=> prev !==0 ? prev-1 : maxIndex)
      }
   }
   const onBoxClicked = ({
@@ -191,7 +189,11 @@ function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
     <>
       <SliderContainer>
         <SliderTitle> {chlidren}  </SliderTitle>
-        <AnimatePresence initial={false} custom={clickReverse} onExitComplete={toggleLeaving}>
+        <AnimatePresence 
+          initial={false} 
+          custom={clickReverse} 
+          onExitComplete={toggleLeaving}
+        >
         <Row  
         key={type + index}
         custom={clickReverse}
@@ -201,30 +203,32 @@ function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
         exit='exit'
         transition={{type:'tween',duration:1}}
         >
-          {data?.results.slice(1).slice(index*offset,index*offset+offset).map(movie=>
+          {data?.results
+          .slice(1)
+          .slice(index*offset,index*offset+offset)
+          .map(movie=>
           <>
-            <Box key={type + movie.id} 
-            layoutId={type + movie.id}
-            whileHover='hover'
-            initial='nomal'
-            variants={boxVariants}
-            transition={{type:'tween'}}
-            bgphoto={makeImagePath(movie.backdrop_path,'w500')}
-            onClick={() => onBoxClicked({movieId:movie.id,category:type})}
+            <Box 
+              key={type + movie.id} 
+              layoutId={type + movie.id}
+              variants={boxVariants}
+              initial='nomal'
+              whileHover='hover'
+              transition={{type:'tween'}}
+              bgphoto={makeImagePath(movie.backdrop_path,'w500')}
+              onClick={() => onBoxClicked({movieId:movie.id,category:type})}
             > 
               <Info variants={infoVariants}>
                 <h4>{movie.title}</h4>
               </Info> 
             </Box>
-            { index !== 0 &&
-              <Arrow right={false} onClick={decreaseIndex} > <IoIosArrowBack size='70' /> </Arrow>
-            }
-          <Arrow right={true} onClick={increaseIndex}> <IoIosArrowForward size='40' /> </Arrow>
-  
           </>
           )}
         </Row>
       </AnimatePresence>
+      <Arrow right={false} onClick={decreaseIndex} > <IoIosArrowBack size='70' /> </Arrow>
+      <Arrow right={true} onClick={increaseIndex}> <IoIosArrowForward size='40' /> </Arrow>
+
     </SliderContainer>
     <AnimatePresence>
     {bigMovieMatch ? (

@@ -121,7 +121,8 @@ const BigMovie = styled(motion.div)`
   margin: 0 auto;
   z-index:98;
   border-radius: 15px;
-  overflow: hidden;
+  overflow: scroll;
+  overflow-x:hidden;
   background-color: ${props => props.theme.black.lighter};
 `;
 

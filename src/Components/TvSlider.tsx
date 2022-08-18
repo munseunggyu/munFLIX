@@ -120,30 +120,11 @@ const BigMovie = styled(motion.div)`
   margin: 0 auto;
   z-index:99;
   border-radius: 15px;
-  overflow: hidden;
+  overflow: scroll;
+  overflow-x:hidden;
   background-color: ${props => props.theme.black.lighter};
 `;
-const BigCover = styled.div`
-   width: 100%;
-   background-size: cover;
-   background-position: center center;
-   height: 400px;
- `;
 
- const BigTitle = styled.h3`
-   color: ${(props) => props.theme.white.lighter};
-   padding: 20px;
-   font-size: 46px;
-   position: relative;
-   top: -80px;
- `;
-
- const BigOverview = styled.p`
-   padding: 20px;
-   position: relative;
-   top: -80px;
-   color: ${(props) => props.theme.white.lighter};
- `;
 
 function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
   const {data} = useQuery<IGetResult>(['tvs',type],() => getTvs(type))

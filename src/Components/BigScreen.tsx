@@ -65,15 +65,31 @@ const GenresTag = styled.span`
   padding:5px;
   background-color:#FF0000;
   margin-right:5px;
-
   color: ${(props) => props.theme.white.lighter};
+`;
+const SimilarContentsTitle = styled.h3`
+  padding:20px;
+  font-weight:600;
+`
+const SimilarContentsContainer = styled.div`
+  padding:20px;
+  display: grid;
+  grid-template-columns:0.5fr 0.5fr;
+  gap:5px;
+  place-items: center;
+  img{
+    border-radius:5px;
+    width: 100%;
+    margin:0 auto;
+    height:200px;
+  }
 `;
 function BigScreen({clickedMovie,type}:{clickedMovie:IMovie,type:string}){
   const {data} = useQuery<IDetail>(['movies'],() => getDetail(type,clickedMovie.id))
   const similar = useQuery<IGetResult>(['similar'],() => getsimilar(type,clickedMovie.id))
   const similarData = similar.data?.results.slice(0,6)
   console.log(data,'as')
-  console.log(similarData,'si')
+  console.log(similar.data?.results,'si')
   console.log(clickedMovie)
   return(
     <>
@@ -101,7 +117,17 @@ function BigScreen({clickedMovie,type}:{clickedMovie:IMovie,type:string}){
           data?.genres.map(item => <GenresTag>{item.name}</GenresTag>)
         }
       </GenresTagContainer>
-      <BigOverview>{clickedMovie.overview}...</BigOverview> 
+      <BigOverview>{
+      clickedMovie.overview
+      ? clickedMovie.overview.slice(0,300)
+      : null}...</BigOverview> 
+      <SimilarContentsTitle>비슷한 콘텐츠</SimilarContentsTitle>
+      <SimilarContentsContainer>
+      {
+        similarData?.map(v => <img src={makeImagePath(v.backdrop_path)} />)
+        
+      }
+      </SimilarContentsContainer>
     </>
   )
 }

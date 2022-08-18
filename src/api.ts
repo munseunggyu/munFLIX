@@ -3,30 +3,27 @@ import { TvTypes, Types } from "./utilts";
 const BASE_PATH = "https://api.themoviedb.org/3";
 
 export interface IMovie {
-    // id: number;
-    // backdrop_path: string;
-    // poster_path: string;
-    // title: string;
-    // overview: string;
-    // vote_average:number;
-    adult: boolean
-backdrop_path: string
-genre_ids: number[]
-id: number
-original_language: string
-original_title: string
-overview: string
-popularity: number
-poster_path: string
-release_date: string
-title: string
-video: false
-vote_average: number
-vote_count: number
-runtime:number
+  adult?: boolean   //movie
+  first_air_date?:string  //tv
+  backdrop_path: string
+  genre_ids: number[]
+  id: number
+  original_language: string
+  original_title?: string // movie
+  original_name?:string //tv
+  overview: string
+  name?:string // tv
+  popularity: number
+  poster_path: string
+  release_date?: string  //movie
+  title? : string // movie
+  video?: boolean // movie
+  vote_average: number
+  vote_count: number
+  runtime:number
 }
     
-export interface IGetMoviesResult {
+export interface IGetResult {
   dates: {
     maximum: string;
     minimum: string;
@@ -46,7 +43,7 @@ export interface ITv {
 }
 
 export interface IGetTvsResult {
-  results: ITv[]
+  results: IMovie[]
 }
 interface IGenrens{
   id:number,
@@ -73,11 +70,10 @@ export interface IDetail{
   popularity: number
   poster_path: string
   production_companies: ICompaney[]
-  // production_countries?: 
   release_date: string
   revenue: number
   runtime: number
-  // spoken_languages: [{…}]
+  first_air_date:string
   status: string
   tagline: string
   title: string
@@ -85,9 +81,6 @@ export interface IDetail{
   vote_average: number
   vote_count: number
 }
-// export interface IDetailResult{
-//   results:IDetail[]
-// }
 
 export function getMovies(type:Types){
   return fetch(`${BASE_PATH}/movie/${type}?api_key=${process.env.REACT_APP_API_KEY}`).then(
@@ -101,14 +94,14 @@ export function getTvs(type:TvTypes){
     );
 }
 
-export function getDetail(id:number){
-  return fetch(`${BASE_PATH}/movie/${id}?api_key=${process.env.REACT_APP_API_KEY}`).then(
+export function getDetail(type:string,id:number){
+  return fetch(`${BASE_PATH}/${type}/${id}?api_key=${process.env.REACT_APP_API_KEY}`).then(
     (response) => response.json()
 );
 }
 
-export function getsimilar(id:number){
-  return fetch(`${BASE_PATH}/movie/${id}/similar?api_key=${process.env.REACT_APP_API_KEY}`).then(
+export function getsimilar(type:string,id:number){
+  return fetch(`${BASE_PATH}/${type}/${id}/similar?api_key=${process.env.REACT_APP_API_KEY}`).then(
     (response) => response.json()
 );
 }

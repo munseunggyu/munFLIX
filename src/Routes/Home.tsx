@@ -1,6 +1,6 @@
 import { useQuery } from "react-query"
 import styled from "styled-components"
-import { getMovies, IGetMoviesResult } from "../api"
+import { getMovies, IGetResult } from "../api"
 import { makeImagePath, Types } from "../utilts"
 import MovieSlider from "../Components/MovieSlider"
 
@@ -39,7 +39,7 @@ const SliderWrapper = styled.div`
 
 
 function Home(){
-  const {data,isLoading} = useQuery<IGetMoviesResult>(['movies','nowPlaying'],() => getMovies(Types.now_playing))
+  const {data,isLoading} = useQuery<IGetResult>(['movies','nowPlaying'],() => getMovies(Types.now_playing))
  
 
   return(

@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { getDetail, getsimilar, IDetail, IGetMoviesResult, IMovie } from "../api"
+import { getDetail, getsimilar, IDetail, IGetResult, IMovie } from "../api"
 import { makeImagePath } from "../utilts"
 import {AiTwotoneStar} from 'react-icons/ai'
 import { useQuery } from "react-query";
@@ -68,9 +68,9 @@ const GenresTag = styled.span`
 
   color: ${(props) => props.theme.white.lighter};
 `;
-function BigScreen({clickedMovie}:{clickedMovie:IMovie}){
-  const {data} = useQuery<IDetail>(['movies'],() => getDetail(clickedMovie.id))
-  const similar = useQuery<IGetMoviesResult>(['similar'],() => getsimilar(clickedMovie.id))
+function BigScreen({clickedMovie,type}:{clickedMovie:IMovie,type:string}){
+  const {data} = useQuery<IDetail>(['movies'],() => getDetail(type,clickedMovie.id))
+  const similar = useQuery<IGetResult>(['similar'],() => getsimilar(type,clickedMovie.id))
   const similarData = similar.data?.results.slice(0,6)
   console.log(data,'as')
   console.log(similarData,'si')
@@ -86,21 +86,22 @@ function BigScreen({clickedMovie}:{clickedMovie:IMovie}){
       }}
       > 
       <div>
-        <h3>{clickedMovie.title}</h3>
+        <h3>{clickedMovie.title ? clickedMovie.title : clickedMovie.name}</h3>
         <span> <AiTwotoneStar color="RGB(251, 160, 0)" /> <p>{clickedMovie.vote_average}</p></span>
       </div>
       </BigCover>
       <BigOverviewTitle>
-        <h5>{data?.release_date.slice(0,4)}</h5>
-        <RunningTime>{data?.runtime}분</RunningTime>
+        <h5>{data?.release_date ? data.release_date.slice(0,4) : data?.first_air_date.slice(0,4)}</h5>
+        { data?.runtime &&
+          <RunningTime>{data?.runtime}분</RunningTime>
+        }
       </BigOverviewTitle>
       <GenresTagContainer>
         {
           data?.genres.map(item => <GenresTag>{item.name}</GenresTag>)
         }
       </GenresTagContainer>
-      <BigOverview>{clickedMovie.overview.slice(0,300)}...</BigOverview> 
-      <GenresTag>{data?.genres[0].name}</GenresTag> 
+      <BigOverview>{clickedMovie.overview}...</BigOverview> 
     </>
   )
 }

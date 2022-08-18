@@ -1,11 +1,7 @@
-import { AnimatePresence, motion, useViewportScroll } from "framer-motion"
-import { useState } from "react"
 import { useQuery } from "react-query"
-import { matchRoutes, useMatch, useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import {  getTvs, IGetMoviesResult, IGetTvsResult } from "../api"
+import {  getTvs, IGetResult } from "../api"
 import { makeImagePath, TvTypes } from "../utilts"
-import Slider from "../Components/MovieSlider"
 import TvSlider from "../Components/TvSlider"
 
 
@@ -43,7 +39,7 @@ const SliderWrapper = styled.div`
 
 
 function Tv(){
-  const {data,isLoading} = useQuery<IGetTvsResult>(['tvs','popular'],() => getTvs(TvTypes.popular))
+  const {data,isLoading} = useQuery<IGetResult>(['tvs','popular'],() => getTvs(TvTypes.popular))
   return(
     <Wrapper>
       {

@@ -1,11 +1,12 @@
 import { AnimatePresence, motion, useViewportScroll  } from "framer-motion"
 import { useState } from "react"
 import { useQuery } from "react-query"
-import { matchRoutes, useMatch, useNavigate } from "react-router-dom"
+import { useMatch, useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { getMovies, getTvs, IGetMoviesResult, IGetTvsResult } from "../api"
+import { getMovies, getTvs, IGetResult, IGetTvsResult } from "../api"
 import { makeImagePath, TvTypes, Types } from "../utilts"
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
+import BigScreen from "./BigScreen"
 
 const SliderContainer = styled.div`
 margin-bottom:250px;
@@ -145,7 +146,7 @@ const BigCover = styled.div`
  `;
 
 function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
-  const {data} = useQuery<IGetTvsResult>(['tvs',type],() => getTvs(type))
+  const {data} = useQuery<IGetResult>(['tvs',type],() => getTvs(type))
   const [index,setIndex] = useState(0)
   const {scrollY} =useViewportScroll()
   const offset = 6
@@ -184,6 +185,7 @@ function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
   const onOverlayClick = () => navigate('/tv')
   const clickedMovie = bigMovieMatch?.params.tvId && 
   data?.results.find(movie => String(movie.id) === bigMovieMatch.params.tvId)
+  console.log(clickedMovie)
   return (
     <>
       <SliderContainer>
@@ -234,16 +236,7 @@ function TvSlider({type,chlidren}:{type:TvTypes,chlidren:string}){
         > 
               {clickedMovie && (
               <>
-                <BigCover
-                  style={{
-                    backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                      clickedMovie.backdrop_path ? clickedMovie.backdrop_path : clickedMovie.poster_path ,
-                      "w500"
-                    )})`,
-                  }}
-                />
-                <BigTitle>{clickedMovie.name}</BigTitle>
-                <BigOverview>{clickedMovie.overview ? clickedMovie.overview : clickedMovie.name}</BigOverview>
+                <BigScreen clickedMovie={clickedMovie} type='tv' />
               </>
             )}
         </BigMovie>

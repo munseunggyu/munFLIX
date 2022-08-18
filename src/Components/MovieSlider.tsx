@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useQuery } from "react-query"
 import { matchRoutes, useMatch, useNavigate } from "react-router-dom"
 import styled from "styled-components"
-import { getMovies, IGetMoviesResult } from "../api"
+import { getMovies, IGetResult } from "../api"
 import { makeImagePath, Types } from "../utilts"
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
 import BigScreen from "./BigScreen"
@@ -127,7 +127,7 @@ const BigMovie = styled(motion.div)`
 
 
 function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
-  const {data} = useQuery<IGetMoviesResult>(['movies',type],() => getMovies(type))
+  const {data} = useQuery<IGetResult>(['movies',type],() => getMovies(type))
   const [index,setIndex] = useState(0)
   const {scrollY} =useViewportScroll()
   const offset = 6
@@ -223,7 +223,7 @@ function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
         > 
               {clickedMovie && (
               <>
-                <BigScreen clickedMovie={clickedMovie} />
+                <BigScreen clickedMovie={clickedMovie} type='movie' />
               </>
             )}
         </BigMovie>

@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { getMovies, IGetMoviesResult } from "../api"
 import { makeImagePath, Types } from "../utilts"
 import { IoIosArrowBack,IoIosArrowForward } from "react-icons/io";
+import BigScreen from "./BigScreen"
 
 const SliderContainer = styled.div`
 margin-bottom:250px;
@@ -123,27 +124,7 @@ const BigMovie = styled(motion.div)`
   overflow: hidden;
   background-color: ${props => props.theme.black.lighter};
 `;
-const BigCover = styled.div`
-   width: 100%;
-   background-size: cover;
-   background-position: center center;
-   height: 400px;
- `;
 
- const BigTitle = styled.h3`
-   color: ${(props) => props.theme.white.lighter};
-   padding: 20px;
-   font-size: 46px;
-   position: relative;
-   top: -80px;
- `;
-
- const BigOverview = styled.p`
-   padding: 20px;
-   position: relative;
-   top: -80px;
-   color: ${(props) => props.theme.white.lighter};
- `;
 
 function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
   const {data} = useQuery<IGetMoviesResult>(['movies',type],() => getMovies(type))
@@ -218,6 +199,7 @@ function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
               bgphoto={makeImagePath(movie.backdrop_path,'w500')}
               onClick={() => onBoxClicked({movieId:movie.id,category:type})}
             > 
+            
               <Info variants={infoVariants}>
                 <h4>{movie.title}</h4>
               </Info> 
@@ -235,22 +217,13 @@ function MovieSlider({type,chlidren}:{type:Types,chlidren:string}){
       <>
         <Overlay onClick={onOverlayClick}
     />  
-        <BigMovie
+          <BigMovie
         style={{top:scrollY.get() -550}}
         layoutId={type + bigMovieMatch.params.movieId!!}
         > 
               {clickedMovie && (
               <>
-                <BigCover
-                  style={{
-                    backgroundImage: `linear-gradient(to top, black, transparent), url(${makeImagePath(
-                      clickedMovie.backdrop_path,
-                      "w500"
-                    )})`,
-                  }}
-                />
-                <BigTitle>{clickedMovie.title}</BigTitle>
-                <BigOverview>{clickedMovie.overview}</BigOverview>
+                <BigScreen clickedMovie={clickedMovie} />
               </>
             )}
         </BigMovie>

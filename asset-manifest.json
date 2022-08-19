@@ -1,10 +1,10 @@
 {
   "files": {
-    "main.js": "/munflix/static/js/main.44745f8f.js",
+    "main.js": "/munflix/static/js/main.857981a5.js",
     "index.html": "/munflix/index.html",
-    "main.44745f8f.js.map": "/munflix/static/js/main.44745f8f.js.map"
+    "main.857981a5.js.map": "/munflix/static/js/main.857981a5.js.map"
   },
   "entrypoints": [
-    "static/js/main.44745f8f.js"
+    "static/js/main.857981a5.js"
   ]
 }

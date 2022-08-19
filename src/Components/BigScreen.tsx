@@ -1,8 +1,10 @@
 import styled from "styled-components";
-import { getDetail, getsimilar, IDetail, IGetResult, IMovie } from "../api"
+import { getDetail, getsimilar, getTrailer, IDetail, IGetResult, IMovie, ITrailer } from "../api"
 import { makeImagePath } from "../utilts"
 import {AiTwotoneStar} from 'react-icons/ai'
 import { useQuery } from "react-query";
+import ReactPlayer from "react-player";
+import { useEffect, useState } from "react";
 
 const BigCover = styled.div`
   width: 100%;
@@ -54,6 +56,23 @@ const RunningTime = styled.span`
   color: ${(props) => props.theme.white.lighter};
   padding:5px;
   font-weight:500;
+  margin-right:10px;
+`;
+const TrailerContainer = styled.div`
+  z-index:5;
+  width:100%;
+  height:100%;
+`;
+const YoutubeToggleBtn = styled.button`
+  border-radius:5px;
+  background-color:#FBC530;
+  color: ${(props) => props.theme.white.lighter};
+  padding:5px;
+  font-weight:500;
+  background-color:red;
+  outline:none;
+  cursor: pointer;
+  border:0;
 `;
 const GenresTagContainer = styled.div`
   padding:20px;
@@ -63,7 +82,7 @@ const GenresTag = styled.span`
   border-radius:5px;
   font-weight:500;
   padding:5px;
-  background-color:#FF0000;
+  background-color:#808080;
   margin-right:5px;
   color: ${(props) => props.theme.white.lighter};
 `;
@@ -84,13 +103,22 @@ const SimilarContentsContainer = styled.div`
     height:200px;
   }
 `;
+
 function BigScreen({clickedMovie,type}:{clickedMovie:IMovie,type:string}){
   const {data} = useQuery<IDetail>(['movies'],() => getDetail(type,clickedMovie.id))
   const similar = useQuery<IGetResult>(['similar'],() => getsimilar(type,clickedMovie.id))
   const similarData = similar.data?.results.slice(0,6)
-  console.log(data,'as')
-  console.log(similar.data?.results,'si')
-  console.log(clickedMovie)
+  const trailer = useQuery<ITrailer>(['trailar'],() => getTrailer(type,clickedMovie.id))
+  let [youtubeToggle,setYoutubeToggle] = useState(false)
+  let [youtube,setYoutube] = useState('')
+  const onYoutubeToggle = () => {
+    setYoutubeToggle(prev => !prev)
+    if(trailer.data?.results.length !== 0){
+      setYoutube(`https://www.youtube.com/watch?v=${trailer.data?.results[0].key}`)
+    }else{
+      alert('트레일러가 없습니다')
+    }
+  }
   return(
     <>
       <BigCover 
@@ -101,16 +129,26 @@ function BigScreen({clickedMovie,type}:{clickedMovie:IMovie,type:string}){
         )})`,
       }}
       > 
-      <div>
+      { youtubeToggle
+      ? <TrailerContainer>
+          <ReactPlayer url={youtube || undefined } width="100%" height='100%' />
+      </TrailerContainer>
+       : 
+       <div>
         <h3>{clickedMovie.title ? clickedMovie.title : clickedMovie.name}</h3>
         <span> <AiTwotoneStar color="RGB(251, 160, 0)" /> <p>{clickedMovie.vote_average}</p></span>
       </div>
+       }
       </BigCover>
+      
       <BigOverviewTitle>
-        <h5>{data?.release_date ? data.release_date.slice(0,4) : data?.first_air_date.slice(0,4)}</h5>
+        <h5>
+          {data?.release_date ? data.release_date.slice(0,4) : data?.first_air_date.slice(0,4)}
+        </h5>
         { data?.runtime &&
           <RunningTime>{data?.runtime}분</RunningTime>
         }
+          <YoutubeToggleBtn onClick={onYoutubeToggle} >Youtube</YoutubeToggleBtn> 
       </BigOverviewTitle>
       <GenresTagContainer>
         {
@@ -124,7 +162,7 @@ function BigScreen({clickedMovie,type}:{clickedMovie:IMovie,type:string}){
       <SimilarContentsTitle>비슷한 콘텐츠</SimilarContentsTitle>
       <SimilarContentsContainer>
       {
-        similarData?.map(v => <img src={makeImagePath(v.backdrop_path)} />)
+        similarData?.map((similar,i) => <img key={similar.id+i} src={makeImagePath(similar.backdrop_path)} />)
         
       }
       </SimilarContentsContainer>

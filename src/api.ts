@@ -82,6 +82,23 @@ export interface IDetail{
   vote_count: number
 }
 
+export interface ITrailer{
+  id:number
+  results: ITr[]
+}
+ interface ITr{
+  iso_639_1:string,
+  iso_3166_1:string,
+  name:string
+  key:string
+  site:string
+  size:number
+  type:string
+  official:boolean
+  published_at:string
+  id:string
+}
+
 export function getMovies(type:Types){
   return fetch(`${BASE_PATH}/movie/${type}?api_key=${process.env.REACT_APP_API_KEY}`).then(
     (response) => response.json()
@@ -105,3 +122,11 @@ export function getsimilar(type:string,id:number){
     (response) => response.json()
 );
 }
+
+export function getTrailer(type:string,id:number){
+  return fetch(`${BASE_PATH}/${type}/${id}/videos?api_key=${process.env.REACT_APP_API_KEY}`).then(
+      (response) => response.json()
+  );
+}
+
+
